@@ -4,22 +4,66 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Platform
+  Platform,
+  Clipboard
 } from 'react-native';
+import { background } from '../styles/colors';
+import { CardIOModule, CardIOUtilities } from 'react-native-awesome-card-io';
+import Toast from '../styles/toast';
+import Toaster from 'react-native-toaster';
 
 export default class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { message: null };
+  }
+
+  static navigationOptions = {
+    title: 'Scan Card',
+    headerTintColor: '#88f986',
+    headerStyle: {
+      backgroundColor: 'black'
+    }
+  };
+
+  componentWillMount() {
+    if (Platform.OS === 'ios') {
+      CardIOUtilities.preload();
+    }
+  }
+
+  copyClipboard(cardNumber) {
+    Clipboard.setString(cardNumber);
+    const message = {};
+    message.text = 'Copied to clipboard';
+    message.styles = Toast.info;
+    this.setState({ message });
+  }
+
+  scanCard() {
+    console.log('aki');
+    CardIOModule.scanCard()
+      .then(data => {
+        this.copyClipboard(data.cardNumber);
+      })
+      .catch(() => {
+        // the user cancelled
+      });
+  }
+
   render() {
     return (
       <View style={styles.container}>
+        <Toaster message={this.state.message} />
         <TouchableOpacity
           style={
             Platform.OS === 'ios'
               ? styles.iosSubmitBtn
               : styles.androidSubmitBtn
           }
-          onPress={() => this.props.navigation.navigate('SaveCard')}
+          onPress={this.scanCard.bind(this)}
         >
-          <Text style={styles.submitBtnText}>Save a Card</Text>
+          <Text style={styles.submitBtnText}>Scan</Text>
         </TouchableOpacity>
       </View>
     );
@@ -29,34 +73,22 @@ export default class Home extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'black',
     justifyContent: 'center'
   },
   iosSubmitBtn: {
-    width: 300,
-    backgroundColor: '#4286f4',
+    backgroundColor: '#88f986',
     padding: 10,
-    borderRadius: 7,
+    borderRadius: 5,
     height: 45,
     marginLeft: 40,
     marginRight: 40,
-    marginTop: 10
-  },
-  androidSubmitBtn: {
-    width: 300,
-    backgroundColor: '#4286f4',
-    padding: 10,
-    paddingLeft: 30,
-    paddingRight: 30,
-    height: 45,
-    borderRadius: 2,
-    alignSelf: 'flex-end',
+    marginTop: 10,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10
+    alignItems: 'center'
   },
   submitBtnText: {
-    color: 'white',
+    color: 'black',
     fontSize: 22,
     textAlign: 'center'
   }

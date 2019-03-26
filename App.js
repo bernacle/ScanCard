@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { createAppContainer } from 'react-navigation';
-import { MainNavigator } from './src/Routes';
-
-const AppContainer = createAppContainer(MainNavigator);
+import Home from './src/components/Home';
 
 type Props = {};
 export default class App extends Component<Props> {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <AppContainer />
+        <Home />
       </View>
     );
   }
